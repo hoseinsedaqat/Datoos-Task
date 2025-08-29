@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const res = await axios.get(
       "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest",
       {
-        headers: { "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY! },
+        headers: { "X-CMC_PRO_API_KEY": process.env.COINMARKETCAP_API_KEY! },
         params: { start, limit, convert: "USD" },
       }
     );
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
     }
 
     const data = res.data.data.map((item: CryptoItem) => ({
-      id: item.id,
+      id: Number(item.id),
       name: item.name,
       symbol: item.symbol,
       cmc_rank: item.cmc_rank,
