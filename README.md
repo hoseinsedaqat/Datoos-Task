@@ -36,6 +36,6 @@ It fetches data from an external API, caches results in **IndexedDB**, and displ
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/your-username/datoos-task.git
+git clone https://github.com/hoseinsedaqat/datoos-task.git
 cd datoos-task
 npm install
