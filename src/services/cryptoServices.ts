@@ -6,21 +6,41 @@
 //   return res.data as Crypto[];
 // };
 
-export async function fetchCryptos(start: number, limit: number) {
-  const apiKey = process.env.COINMARKETCAP_API_KEY; // امن و فقط سمت سرور
+// services/cryptoServices.ts
+import axios from "axios";
+import { Crypto } from "@/lib/types";
 
-  const res = await fetch(
-    `https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest?start=${start}&limit=${limit}`,
-    {
-      headers: {
-        "X-CMC_PRO_API_KEY": apiKey || "",
+const API_KEY = process.env.NEXT_PUBLIC_CMC_API_KEY; // از Netlify یا .env میاد
+const BASE_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
+
+export async function fetchCryptos(start: number, limit: number): Promise<Crypto[]> {
+  const response = await axios.get(BASE_URL, {
+    params: {
+      start,
+      limit,
+      convert: "USD",
+    },
+    headers: {
+      "X-CMC_PRO_API_KEY": API_KEY,
+    },
+  });
+
+  const data = response.data.data;
+
+  // normalize → مطمئن شیم id همیشه number هست
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return data.map((item: any) => ({
+    id: Number(item.id),  // 👈 اینجا تبدیل می‌کنیم
+    name: item.name,
+    symbol: item.symbol,
+    cmc_rank: item.cmc_rank,
+    logo: item.logo ?? "", // اگه نداشت خالی
+    quote: {
+      USD: {
+        price: item.quote.USD.price,
       },
-      next: { revalidate: 60 }, // ISR برای کش
-    }
-  );
-
-  if (!res.ok) throw new Error("Failed to fetch cryptos");
-  const data = await res.json();
-  return data.data; // فقط آرایه کریپتوها
+    },
+  }));
 }
+
 
